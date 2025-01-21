@@ -6,3 +6,7 @@ src/verilog/odo_gen
 src/pool/fakepool
 src/projects/*/build_files/*
 src/projects/*/output_files/*
+src/projects/*/ip/.qsys_edit/*
+src/projects/*/ip/pll/*
+src/projects/*/ip/rst_release/*
+src/projects/*/pll_gen/*

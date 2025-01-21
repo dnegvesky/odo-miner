@@ -197,7 +197,7 @@ proc choose_hardware {argv} {
     } else {
         set hardware_name [select_hardware]
     }
-    set miner_id [lindex [split $hardware_name] 1]
+    set miner_id [lindex [split $hardware_name] end]
     set project_config [identify_project $hardware_name]
     if {$project_config eq ""} {
         post_message -type error "Unable to identify project for hardware"

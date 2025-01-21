@@ -26,6 +26,16 @@ fi
 PROJECT="$1"
 SEED="$2"
 
+if [ "$PROJECT" == "200g" ] 
+then
+    export QUARTUSPATH=~/intelFPGA_pro/17.1/quartus/bin
+elif [ "$PROJECT" == "sockit" ] || [ "$PROJECT" == "de10_nano" ]
+then
+    export QUARTUSPATH=~/intelFPGA/19.1/quartus/bin
+else
+    export QUARTUSPATH=~/intelFPGA_pro/19.3/quartus/bin
+fi
+
 if ! [ -d "projects/$PROJECT" ]
 then
     echo "Error: project $PROJECT does not exist" 1>&2
@@ -63,7 +73,22 @@ fi
 mkdir -p "$BUILDDIR"
 (
 export FAMILY DEVICE THROUGHPUT CLK_PIN PLL_FILE SEED FITTER_SEED
-envsubst < "projects/altera_template.txt" > "$PROJFILE"
+# used by Arria 10 and/or Stratix 10
+export RST_PIN RST_POLARITY PWRMGT_SCL_PIN PWRMGT_SDA_PIN CONF_DONE_PIN PWRMGT_I2C_ADDR
+case $FAMILY in
+   "Cyclone V")
+        envsubst < "projects/altera_template.txt" > "$PROJFILE"
+   ;;
+   "Arria 10")
+        envsubst < "projects/altera_a10_template.txt" > "$PROJFILE"
+   ;;
+   "Stratix 10")
+        envsubst < "projects/altera_s10_template.txt" > "$PROJFILE"
+   ;;
+   *)
+      echo "Invalid Family name in params.sh"
+   ;;
+esac
 )
 verilog/odo_gen "$SEED" "$THROUGHPUT" "odo_" > "$BUILDDIR/odo_$SEED.v"
 

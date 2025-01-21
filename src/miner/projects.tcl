@@ -17,6 +17,13 @@ set known_projects [list \
     [list cyclone_v_gx_starter_kit 1 USB-Blaster 0x02B020DD] \
     [list de10_nano 2 DE-SoC 0x4BA00477 0x02D020DD] \
     [list arria_v_gx_starter_kit 1 USB-BlasterII 0x02A030DD 0x020A40DD] \
+    [list sockit 1 "CV SoCKit" 0x02D020DD 0x4BA00477] \
+    [list achilles 1 "Arria10 IDK" 0x02E050DD 0x4BA00477 0x031830DD] \
+    [list alaric 1 "Arria10 IDK" 0x02E050DD 0x4BA00477 0x031020DD] \
+    [list sargon_es 1 "JTAG USB" 0x032250DD 0x031830DD] \
+    [list sargon 1 "JTAG USB" 0xC32250DD 0x031830DD] \
+    [list comxpress 1 "JTAG USB" 0xC321D0DD] \
+    [list 200g 1 "JTAG USB" 0x032150DD 0x031830DD] \
 ]
 
 # Extract the parenthesized hex code from a device name

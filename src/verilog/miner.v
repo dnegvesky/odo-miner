@@ -124,9 +124,16 @@ module pad_nonce(clk, in, out);
     end
 endmodule
 
+// Arria 10 and Stratix 10 IOPLLs must have reset connected to external pin or internal logic
+`ifdef USE_PLL_RST
+module miner_top(osc_clk, fpga_rst);
+    input osc_clk;
+    input fpga_rst;
+`else
 module miner_top(osc_clk);
     input osc_clk;
-    
+`endif
+
     wire [607:0] header;
     // Altera docs suggest maximum source width is 256, but it actually seems
     // to go higher than that (but not up to 608). So split the header into 2
@@ -144,11 +151,38 @@ module miner_top(osc_clk);
     
     wire [31:0] seed = `ODOKEY;
     probe #(32, "SEED") probe_seed(seed);
-    
+
     wire miner_clk;
-    pll main_pll(osc_clk, miner_clk);
+    `ifdef FPGA_IS_STRATIX10
+        wire sys_rst;
+        wire int_ninit_done;
+        rst_release sys_rst_release(int_ninit_done);
+        `ifdef RST_POLARITY
+            if (`RST_POLARITY == 1) begin
+                assign sys_rst = ~int_ninit_done & fpga_rst;
+            end else begin
+                assign sys_rst = ~int_ninit_done & ~fpga_rst;
+            end
+        `endif
+          pll main_pll(
+              .rst      (sys_rst),
+              .refclk   (osc_clk),
+              .outclk_0 (miner_clk)
+          );
+    `elsif FPGA_IS_ARRIA10
+    wire sys_rst;
+        `ifdef RST_POLARITY
+            if (`RST_POLARITY == 1) begin
+                assign sys_rst = fpga_rst;
+            end else begin
+                assign sys_rst = ~fpga_rst;
+            end
+        `endif
+        pll main_pll(osc_clk, sys_rst, miner_clk);
+    `else  // Cyclone V
+        pll main_pll(osc_clk, miner_clk);
+    `endif
 
     miner(miner_clk, header, target, nonce);
     pad_nonce(miner_clk, nonce, padded_nonce);
 endmodule
-    
